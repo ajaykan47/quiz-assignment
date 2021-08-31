@@ -9,21 +9,32 @@ import {
     Button
 } from '@material-ui/core';
 
-function Questions({isFetching, data, setQuestionNumber, question}) {
-    const autoPageTime = 10000
-
+function Questions({
+    isFetching,
+    data,
+    setQuestionNumber,
+    question,
+    setScore,
+    score,
+    setDifficultyLevel,
+    clearData
+}) {
     const [value, setValue] = useState(null)
     const [feedbackBox, setFeedbackBox] = useState(false)
-
-    const bindAutoPage = () => {
-        setInterval(() => {
-            handleNext()
-        }, autoPageTime)
-    }
+    const [scoreBox, openScoreBox] = useState(false)
 
     useEffect(() => {
-        bindAutoPage()
-    }, []);    
+        if(question < 10) {
+            setTimeout(() => {
+             handleNext()
+            }, 10000);
+        }
+
+        else {
+            openScoreBox(true)
+        }
+      
+    }, [question]);
 
     const handleChange = event => {
         setFeedbackBox(false)
@@ -31,6 +42,11 @@ function Questions({isFetching, data, setQuestionNumber, question}) {
     }
 
     const handleSubmit = () => {
+        if(data.correct === value) {
+            const newScore = score + 1
+            setScore(newScore)
+        }
+        
         setFeedbackBox(true)
     }
 
@@ -42,19 +58,33 @@ function Questions({isFetching, data, setQuestionNumber, question}) {
     const renderHTML = (escapedHTML) => 
         React.createElement("div", { dangerouslySetInnerHTML: { __html: escapedHTML } });
 
-    const handlePrevious = () => {
-        setQuestionNumber(question - 1)
-        initializeValue()
-    }
-
     const handleNext = () => {
         setQuestionNumber(question + 1)
         initializeValue()
     }
 
+    const handleReset = () => {
+        setDifficultyLevel('')
+        clearData()
+    }
+    
+    if(scoreBox) {
+        return (
+            <div>
+                <span>Your Total Score is {score}.</span>
+                <div>
+                    Do you want to play again?
+                    <Button onClick={handleReset}>
+                        Yes
+                    </Button>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="questions">
-            {isFetching ? (
+            {(isFetching && !data) ? (
                 <CircularProgress />
             ) : (
                 <div>
@@ -65,7 +95,13 @@ function Questions({isFetching, data, setQuestionNumber, question}) {
                         </FormLabel>
                         <RadioGroup value={value} onChange={handleChange}>
                             {data.options.map((option, index) => (
-                                <FormControlLabel value={option} control={<Radio />} label={renderHTML(option)} key={index} />
+                                <FormControlLabel
+                                    value={option}
+                                    control={<Radio />}
+                                    label={renderHTML(option)}
+                                    key={index}
+                                    disabled={feedbackBox}
+                                />
                             ))}
                         </RadioGroup>
                     </FormControl>
@@ -73,7 +109,7 @@ function Questions({isFetching, data, setQuestionNumber, question}) {
                 </div>
             )}
             <div style={{display: 'flex'}}>
-                <Button onClick={handleSubmit} disabled={!value}>
+                <Button onClick={handleSubmit} disabled={!value || feedbackBox}>
                     Submit
                 </Button>
             </div>   
@@ -89,14 +125,6 @@ function Questions({isFetching, data, setQuestionNumber, question}) {
                     }
                 </div>
             )}
-            <div style={{display: 'flex'}}>
-                <Button onClick={handlePrevious} disabled={question === 1}>
-                    Previous
-                </Button>
-                <Button onClick={handleNext} disabled={data && data.disableNext}>
-                    Next
-                </Button>
-            </div>
         </div>
     );
 }

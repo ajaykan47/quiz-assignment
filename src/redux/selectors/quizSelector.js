@@ -10,7 +10,7 @@ export const quizRowSelector = createSelector(
     (quizes, questionNumber) => {
         const quizeData = Object.values(quizes)
         
-        const rows = suffleData(quizeData).map((quiz, index) => {
+        const rows = quizeData.map((quiz, index) => {
             const options = quiz.incorrect_answers.concat(quiz.correct_answer)
             return ({
                 index: index + 1,
@@ -27,7 +27,3 @@ export const quizRowSelector = createSelector(
 
 const suffleData = options => 
     options.sort(() => 0.5 - Math.random())
-
-const paginate = (data, currentPage) => {
-    return data[currentPage]
-}

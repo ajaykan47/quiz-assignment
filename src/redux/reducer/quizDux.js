@@ -10,11 +10,8 @@ const handlers = {
         }
     },
 
-    [clearData](ui, payload) {
-        return {
-            ...ui,
-            user: {}
-        }
+    [clearData]() {
+        return []
     }
 }
 

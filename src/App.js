@@ -1,6 +1,6 @@
 import './App.css';
 import Quiz from './components/Quiz';
-import { Route, Switch, Router, Link } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 
 function App() {
   return (
